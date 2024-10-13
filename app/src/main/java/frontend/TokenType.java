@@ -1,12 +1,13 @@
 package frontend;
 
 public enum TokenType {
-  NUMBER,
-  IDENTIFIER,
-  EQUALS,
   LET,
+  IDENTIFIER,
+  NUMBER,
+  EQUALS,
   OPEN_PAREN,
   CLOSE_PAREN,
   BINARY_OPERATOR,
   EOF,
+  NULL,
 };

@@ -8,7 +8,8 @@ import static java.util.Map.entry;
 class Lexer {
 
   private static final Map<String, TokenType> reservedKeywords = Map.ofEntries(
-      entry("let", TokenType.LET));
+      entry("let", TokenType.LET),
+      entry("null", TokenType.NULL));
 
   private static boolean isSkippable(char c) {
     return c == ' ' || c == '\n' || c == '\t';
@@ -32,37 +33,37 @@ class Lexer {
     char c;
     while (!q.isEmpty()) {
       c = q.poll();
-        switch (c) {
-            case '(' -> tokens.add(token(c, TokenType.OPEN_PAREN));
-            case ')' -> tokens.add(token(c, TokenType.CLOSE_PAREN));
-            case '=' -> tokens.add(token(c, TokenType.EQUALS));
-            case '+', '-', '*', '/', '%' -> tokens.add(token(c, TokenType.BINARY_OPERATOR));
-            default -> {
-                /* multi-character tokens */
-                
-                if (Character.isDigit(c)) { // number
-                    String num = "" + c;
-                    while (!q.isEmpty() && Character.isDigit(q.peek())) {
-                        num += q.poll();
-                    }
-                    tokens.add(token(num, TokenType.NUMBER));
-                } else if (Character.isLetter(c)) { // identifier
-                    String word = "" + c;
-                    while (!q.isEmpty() && Character.isLetter(q.peek())) {
-                        word += q.poll();
-                    }
-                    
-                    if (reservedKeywords.containsKey(word)) {
-                        tokens.add(token(word, reservedKeywords.get(word)));
-                    } else {
-                        tokens.add(token(word, TokenType.IDENTIFIER));
-                    }
-                } else if (isSkippable(c)) { // skippable
-                } else {
-                    System.out.println("unrecognised character found: " + c);
-                }
+      switch (c) {
+        case '(' -> tokens.add(token(c, TokenType.OPEN_PAREN));
+        case ')' -> tokens.add(token(c, TokenType.CLOSE_PAREN));
+        case '=' -> tokens.add(token(c, TokenType.EQUALS));
+        case '+', '-', '*', '/', '%' -> tokens.add(token(c, TokenType.BINARY_OPERATOR));
+        default -> {
+          /* multi-character tokens */
+
+          if (Character.isDigit(c)) { // number
+            String num = "" + c;
+            while (!q.isEmpty() && Character.isDigit(q.peek())) {
+              num += q.poll();
             }
+            tokens.add(token(num, TokenType.NUMBER));
+          } else if (Character.isLetter(c)) { // identifier
+            String word = "" + c;
+            while (!q.isEmpty() && Character.isLetter(q.peek())) {
+              word += q.poll();
+            }
+
+            if (reservedKeywords.containsKey(word)) {
+              tokens.add(token(word, reservedKeywords.get(word)));
+            } else {
+              tokens.add(token(word, TokenType.IDENTIFIER));
+            }
+          } else if (isSkippable(c)) { // skippable
+          } else {
+            System.out.println("unrecognised character found: " + c);
+          }
         }
+      }
     }
 
     tokens.add(token("EOF", TokenType.EOF));
