@@ -3,12 +3,25 @@
  */
 package java_project;
 
-public class App {
-    public String getGreeting() {
-        return "Hello World!";
-    }
+import java.util.Scanner;
 
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+import frontend.Parser;
+import frontend.ast.Program;
+
+public class App {
+  public static void main(String[] args) {
+    Parser p = new Parser();
+    System.out.println("Repl v0.1");
+    Scanner s = new Scanner(System.in);
+    while (true) {
+      System.out.print("> ");
+      String input = s.nextLine();
+      if (input.isBlank() || input.equals("exit")) {
+        break;
+      }
+      Program program = p.createAST(input);
+      program.print();
     }
+    s.close();
+  }
 }
