@@ -1,6 +1,6 @@
 package frontend.ast;
 
-public abstract class Expr extends Stmt {
+public abstract class ExprNode extends StatementNode {
 
 	@Override
 	public abstract String toString();

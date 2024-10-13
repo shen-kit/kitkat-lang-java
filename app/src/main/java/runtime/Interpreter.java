@@ -1,18 +1,18 @@
 package runtime;
 
-import frontend.ast.Stmt;
+import frontend.ast.StatementNode;
 import frontend.ast.BinaryExpr;
 import frontend.ast.NodeType;
-import frontend.ast.NumberLiteral;
-import frontend.ast.BooleanLiteral;
-import frontend.ast.Identifier;
+import frontend.ast.NumberNode;
+import frontend.ast.BooleanNode;
+import frontend.ast.IdentifierNode;
 import frontend.ast.Program;
 
 public class Interpreter {
 
 	public RtVal evaluateProgram(Program p, Scope scope) {
 		RtVal lastProcessed = new RtNull();
-		for (Stmt s : p.body) {
+		for (StatementNode s : p.body) {
 			lastProcessed = evaluate(s, scope);
 		}
 		return lastProcessed;
@@ -44,22 +44,22 @@ public class Interpreter {
 		}
 	}
 
-	private RtVal evaluateIdentifier(Identifier identifier, Scope scope) {
+	private RtVal evaluateIdentifier(IdentifierNode identifier, Scope scope) {
 		return scope.getVar(identifier.symbol);
 	}
 
-	public RtVal evaluate(Stmt s, Scope scope) {
+	public RtVal evaluate(StatementNode s, Scope scope) {
 		switch (s.getType()) {
 			case NodeType.PROGRAM:
 				return evaluateProgram((Program) s, scope);
 			case NodeType.BINARY_EXPR:
 				return evaluateBinaryExpr((BinaryExpr) s, scope);
 			case NodeType.NUMBER:
-				return new RtNumber(((NumberLiteral) s).getValue());
+				return new RtNumber(((NumberNode) s).getValue());
 			case NodeType.BOOLEAN:
-				return new RtBool(((BooleanLiteral) s).val);
+				return new RtBool(((BooleanNode) s).val);
 			case NodeType.IDENTIFIER:
-				return evaluateIdentifier((Identifier) s, scope);
+				return evaluateIdentifier((IdentifierNode) s, scope);
 
 			default:
 				throw new RuntimeException("Cannot interpret statement type: " + s.getType());

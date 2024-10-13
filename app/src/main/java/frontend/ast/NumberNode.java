@@ -1,9 +1,9 @@
 package frontend.ast;
 
-public class NumberLiteral extends Expr {
+public class NumberNode extends ExprNode {
 	int value;
 
-	public NumberLiteral(int value) {
+	public NumberNode(int value) {
 		this.type = NodeType.NUMBER;
 		this.value = value;
 	}

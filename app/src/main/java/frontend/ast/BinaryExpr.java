@@ -1,11 +1,11 @@
 package frontend.ast;
 
-public class BinaryExpr extends Expr {
-	public Expr left;
-	public Expr right;
+public class BinaryExpr extends ExprNode {
+	public ExprNode left;
+	public ExprNode right;
 	public String operator;
 
-	public BinaryExpr(Expr left, Expr right, String operator) {
+	public BinaryExpr(ExprNode left, ExprNode right, String operator) {
 		this.type = NodeType.BINARY_EXPR;
 		this.left = left;
 		this.right = right;

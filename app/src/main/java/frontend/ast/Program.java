@@ -2,10 +2,10 @@ package frontend.ast;
 
 import java.util.List;
 
-public class Program extends Stmt {
-	public List<Stmt> body;
+public class Program extends StatementNode {
+	public List<StatementNode> body;
 
-	public Program(List<Stmt> body) {
+	public Program(List<StatementNode> body) {
 		this.type = NodeType.PROGRAM;
 		this.body = body;
 	}
@@ -13,7 +13,7 @@ public class Program extends Stmt {
 	@Override
 	public String toString() {
 		String res = "";
-		for (Stmt s : body) {
+		for (StatementNode s : body) {
 			res += s.toString() + "\n";
 		}
 		return res;

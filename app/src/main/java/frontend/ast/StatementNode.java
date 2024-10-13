@@ -1,6 +1,6 @@
 package frontend.ast;
 
-public abstract class Stmt {
+public abstract class StatementNode {
 	protected NodeType type;
 
 	public NodeType getType() {

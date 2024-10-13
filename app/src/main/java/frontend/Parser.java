@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.Deque;
 
 import frontend.ast.BinaryExpr;
-import frontend.ast.BooleanLiteral;
-import frontend.ast.Expr;
-import frontend.ast.Identifier;
-import frontend.ast.NumberLiteral;
+import frontend.ast.BooleanNode;
+import frontend.ast.ExprNode;
+import frontend.ast.IdentifierNode;
+import frontend.ast.NumberNode;
 import frontend.ast.Program;
-import frontend.ast.Stmt;
+import frontend.ast.StatementNode;
 
 public class Parser {
 	private Deque<Token> tokens = new ArrayDeque<>();
@@ -76,11 +76,11 @@ public class Parser {
 	 * 3. Addition
 	 */
 
-	private Stmt parseStatement() {
+	private StatementNode parseStatement() {
 		return parseExpr();
 	}
 
-	private Expr parseExpr() {
+	private ExprNode parseExpr() {
 		return parseAddExpr();
 	}
 
@@ -91,11 +91,11 @@ public class Parser {
 	 * 
 	 * @return Expression
 	 */
-	private Expr parseAddExpr() {
-		Expr left = parseMultiplyExpr();
+	private ExprNode parseAddExpr() {
+		ExprNode left = parseMultiplyExpr();
 		while (at().value.equals("+") || at().value.equals("-")) {
 			String op = eat().value;
-			Expr right = parseMultiplyExpr();
+			ExprNode right = parseMultiplyExpr();
 			left = new BinaryExpr(left, right, op);
 		}
 		return left;
@@ -109,11 +109,11 @@ public class Parser {
 	 * 
 	 * @return Expression
 	 */
-	private Expr parseMultiplyExpr() {
-		Expr left = parseBaseExpr();
+	private ExprNode parseMultiplyExpr() {
+		ExprNode left = parseBaseExpr();
 		while (at().value.equals("*") || at().value.equals("/") || at().value.equals("%")) {
 			String op = eat().value;
-			Expr right = parseBaseExpr();
+			ExprNode right = parseBaseExpr();
 			left = new BinaryExpr(left, right, op);
 		}
 		return left;
@@ -125,17 +125,17 @@ public class Parser {
 	 * 
 	 * @return Expression
 	 */
-	private Expr parseBaseExpr() {
+	private ExprNode parseBaseExpr() {
 		Token t = eat();
 		switch (t.type) {
 			case TokenType.IDENTIFIER:
-				return new Identifier(t.value);
+				return new IdentifierNode(t.value);
 			case TokenType.NUMBER:
-				return new NumberLiteral(Integer.parseInt(t.value));
+				return new NumberNode(Integer.parseInt(t.value));
 			case TokenType.BOOLEAN:
-				return new BooleanLiteral(t.value.equals("true"));
+				return new BooleanNode(t.value.equals("true"));
 			case TokenType.OPEN_PAREN:
-				Expr e = parseExpr();
+				ExprNode e = parseExpr();
 				expect(TokenType.CLOSE_PAREN, "must close brackets after opening");
 				return e;
 			default:
