@@ -9,6 +9,7 @@ import frontend.Parser;
 import frontend.ast.Program;
 import runtime.Scope;
 import runtime.Interpreter;
+import runtime.RtNull;
 import runtime.RtNumber;
 import runtime.RtVal;
 
@@ -24,6 +25,7 @@ public class App {
 
 		Scope globalScope = new Scope(null);
 		globalScope.declareVar("x", new RtNumber(5));
+		globalScope.declareVar("null", new RtNull());
 
 		Scope innerScope = new Scope(globalScope);
 		innerScope.declareVar("y", new RtNumber(10));

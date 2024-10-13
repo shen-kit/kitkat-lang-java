@@ -60,8 +60,6 @@ public class Interpreter {
 				return new RtBool(((BooleanLiteral) s).val);
 			case NodeType.IDENTIFIER:
 				return evaluateIdentifier((Identifier) s, scope);
-			case NodeType.NULL:
-				return new RtNull();
 
 			default:
 				throw new RuntimeException("Cannot interpret statement type: " + s.getType());
