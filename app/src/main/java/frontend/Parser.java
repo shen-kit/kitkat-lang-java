@@ -12,6 +12,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 
+import frontend.ast.BinaryExpr;
 import frontend.ast.Expr;
 import frontend.ast.Identifier;
 import frontend.ast.NumberLiteral;
@@ -29,17 +30,18 @@ public class Parser {
     return this.tokens.poll();
   }
 
-  private Token expect(Token expected, String errorMsg) {
+  private Token expect(TokenType expected, String errorMsg) {
     Token t = this.tokens.poll();
-    if (t == null || t != expected) {
+    if (t == null || t.type != expected) {
       throw new RuntimeException(
-          String.format("%s\nExpected: %s\nReceived: %s\n\n", errorMsg, expected, t));
+          String.format("%s\nExpected: %s\nReceived: %s\n\n", errorMsg, expected, t.type));
     }
     return t;
   }
 
   public Program createAST(String sourceCode) {
     this.tokens = Lexer.tokenise(sourceCode);
+    System.out.println("token count: " + String.valueOf(tokens.size()));
     Program p = new Program(new ArrayList<>());
 
     while (this.tokens.peek().type != TokenType.EOF) {
@@ -62,18 +64,40 @@ public class Parser {
   }
 
   private Expr parseExpr() {
-    return parseBaseExpr();
+    return parseAddExpr();
+  }
+
+  private Expr parseAddExpr() {
+    Expr left = parseMultiplyExpr();
+    while (at().value.equals("+") || at().value.equals("-")) {
+      String op = eat().value;
+      Expr right = parseMultiplyExpr();
+      left = new BinaryExpr(left, right, op);
+    }
+    return left;
+  }
+
+  private Expr parseMultiplyExpr() {
+    Expr left = parseBaseExpr();
+    while (at().value.equals("*") || at().value.equals("/") || at().value.equals("%")) {
+      String op = eat().value;
+      Expr right = parseBaseExpr();
+      left = new BinaryExpr(left, right, op);
+    }
+    return left;
   }
 
   private Expr parseBaseExpr() {
-    Token t = this.eat();
+    Token t = eat();
     switch (t.type) {
       case TokenType.IDENTIFIER:
         return new Identifier(t.value);
       case TokenType.NUMBER:
         return new NumberLiteral(Integer.parseInt(t.value));
-      case TokenType.EOF:
-
+      case TokenType.OPEN_PAREN:
+        Expr e = parseExpr();
+        expect(TokenType.CLOSE_PAREN, "must close brackets after opening");
+        return e;
       default:
         throw new RuntimeException("Could not parse token: " + t.type + ", value = " + t.value);
     }
