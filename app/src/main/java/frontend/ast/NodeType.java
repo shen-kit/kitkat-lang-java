@@ -1,8 +1,9 @@
 package frontend.ast;
 
-enum NodeType {
-  PROGRAM,
-  NUMBER,
-  IDENTIFIER,
-  BINARY_EXPR
+public enum NodeType {
+	PROGRAM,
+	NUMBER,
+	NULL,
+	IDENTIFIER,
+	BINARY_EXPR
 }

@@ -1,7 +1,12 @@
 package frontend.ast;
 
 public abstract class Stmt {
-  NodeType kind;
+	protected NodeType type;
 
-  public abstract void print();
+	public NodeType getType() {
+		return this.type;
+	}
+
+	@Override
+	public abstract String toString();
 }

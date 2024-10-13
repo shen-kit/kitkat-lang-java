@@ -1,15 +1,19 @@
 package frontend.ast;
 
 public class NumberLiteral extends Expr {
-  int value;
+	int value;
 
-  public NumberLiteral(int value) {
-    this.kind = NodeType.NUMBER;
-    this.value = value;
-  }
+	public NumberLiteral(int value) {
+		this.type = NodeType.NUMBER;
+		this.value = value;
+	}
 
-  @Override
-  public void print() {
-    System.out.println("number: " + String.valueOf(this.value));
-  }
+	public int getValue() {
+		return this.value;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("number: %d", this.value);
+	}
 }

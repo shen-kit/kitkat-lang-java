@@ -6,15 +6,16 @@ public class Program extends Stmt {
 	public List<Stmt> body;
 
 	public Program(List<Stmt> body) {
-		this.kind = NodeType.PROGRAM;
+		this.type = NodeType.PROGRAM;
 		this.body = body;
 	}
 
 	@Override
-	public void print() {
-		System.out.println("Program:");
+	public String toString() {
+		String res = "";
 		for (Stmt s : body) {
-			s.print();
+			res += s.toString() + "\n";
 		}
+		return res;
 	}
 }

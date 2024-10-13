@@ -1,12 +1,12 @@
 package frontend.ast;
 
 public class BinaryExpr extends Expr {
-	Expr left;
-	Expr right;
-	String operator;
+	public Expr left;
+	public Expr right;
+	public String operator;
 
 	public BinaryExpr(Expr left, Expr right, String operator) {
-		this.kind = NodeType.BINARY_EXPR;
+		this.type = NodeType.BINARY_EXPR;
 		this.left = left;
 		this.right = right;
 		this.operator = operator;
@@ -14,13 +14,6 @@ public class BinaryExpr extends Expr {
 
 	@Override
 	public String toString() {
-		return String.format("%s %s %s", left.toString(), operator, right.toString());
-	}
-
-	@Override
-	public void print() {
-		System.out.printf("binary expr (%s): \n", operator);
-		left.print();
-		right.print();
+		return String.format("binary expr (%s): \n%s\n%s", operator, left.toString(), right.toString());
 	}
 }
