@@ -7,21 +7,27 @@ import java.util.Scanner;
 
 import frontend.Parser;
 import frontend.ast.Program;
+import runtime.Interpreter;
+import runtime.RtVal;
 
 public class App {
-  public static void main(String[] args) {
-    Parser p = new Parser();
-    System.out.println("Repl v0.1");
-    Scanner s = new Scanner(System.in);
-    while (true) {
-      System.out.print("> ");
-      String input = s.nextLine();
-      if (input.isBlank() || input.equals("exit")) {
-        break;
-      }
-      Program program = p.createAST(input);
-      program.print();
-    }
-    s.close();
-  }
+	public static void main(String[] args) {
+		Parser p = new Parser();
+		System.out.println("Repl v0.1");
+		Scanner s = new Scanner(System.in);
+		while (true) {
+			System.out.print("> ");
+			String input = s.nextLine();
+			if (input.isBlank() || input.equals("exit")) {
+				break;
+			}
+			Program program = p.createAST(input);
+			System.out.println(program);
+
+			Interpreter interp = new Interpreter();
+			RtVal val = interp.evaluate(program);
+			System.out.println(val);
+		}
+		s.close();
+	}
 }
