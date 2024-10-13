@@ -8,6 +8,7 @@ public enum TokenType {
   OPEN_PAREN,
   CLOSE_PAREN,
   BINARY_OPERATOR,
+  BOOLEAN,
   EOF,
   NULL,
 };

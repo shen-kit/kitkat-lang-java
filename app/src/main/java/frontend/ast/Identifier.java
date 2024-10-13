@@ -1,7 +1,7 @@
 package frontend.ast;
 
 public class Identifier extends Expr {
-	String symbol;
+	public String symbol;
 
 	public Identifier(String symbol) {
 		this.type = NodeType.IDENTIFIER;

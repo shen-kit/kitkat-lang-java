@@ -7,25 +7,38 @@ import java.util.Scanner;
 
 import frontend.Parser;
 import frontend.ast.Program;
+import runtime.Scope;
 import runtime.Interpreter;
+import runtime.RtNumber;
 import runtime.RtVal;
 
 public class App {
 	public static void main(String[] args) {
+		System.out.println("========================================");
+		System.out.println("               Repl v0.1                ");
+		System.out.println("           Press 'q' to exit            ");
+		System.out.println("========================================\n");
+
 		Parser p = new Parser();
-		System.out.println("Repl v0.1");
 		Scanner s = new Scanner(System.in);
+
+		Scope globalScope = new Scope(null);
+		globalScope.declareVar("x", new RtNumber(5));
+
+		Scope innerScope = new Scope(globalScope);
+		innerScope.declareVar("y", new RtNumber(10));
+
 		while (true) {
 			System.out.print("> ");
 			String input = s.nextLine();
-			if (input.isBlank() || input.equals("exit")) {
+			if (input.equals("q")) {
 				break;
 			}
 			Program program = p.createAST(input);
-			System.out.println(program);
+			// System.out.println(program);
 
 			Interpreter interp = new Interpreter();
-			RtVal val = interp.evaluate(program);
+			RtVal val = interp.evaluate(program, innerScope);
 			System.out.println(val);
 		}
 		s.close();

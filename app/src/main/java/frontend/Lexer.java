@@ -9,7 +9,9 @@ class Lexer {
 
   private static final Map<String, TokenType> reservedKeywords = Map.ofEntries(
       entry("let", TokenType.LET),
-      entry("null", TokenType.NULL));
+      entry("null", TokenType.NULL),
+      entry("false", TokenType.BOOLEAN),
+      entry("true", TokenType.BOOLEAN));
 
   private static boolean isSkippable(char c) {
     return c == ' ' || c == '\n' || c == '\t';
