@@ -5,4 +5,4 @@
 build
 
 # ignore .class files
-./app/bin/**/*
+app/bin/
