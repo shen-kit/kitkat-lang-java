@@ -71,14 +71,6 @@ public class Parser {
 		return t;
 	}
 
-	/**
-	 * Order of Precedence:
-	 *
-	 * 1. Base expressions (literals, parentheses, keywords)
-	 * 2. Multiplication
-	 * 3. Addition
-	 */
-
 	private StatementNode parseStatement() {
 		switch (at().type) {
 			case TokenType.VAR_DECLARATION:
@@ -89,10 +81,8 @@ public class Parser {
 	}
 
 	/**
-	 * Parse a variable declaration of any of the following structures:
-	 * let <varname> = <expr>;
-	 * const <varname> = <expr>;
-	 * let <varname>;
+	 * Parses a variable declaration of the form:
+	 * ( let | const ) ( varname ) = ( expr );
 	 * 
 	 * @return VarDeclarationNode if successful
 	 */
@@ -100,8 +90,7 @@ public class Parser {
 		boolean isConst = eat().value.equals("const");
 		String varname = eat().value;
 		ExprNode expr = new IdentifierNode("null");
-		// parse '=' and the following expression if variable declared as const
-		// (required), or let but with instant initialisation
+		// value required if const
 		if (isConst || at().type == TokenType.EQUALS) {
 			expect(TokenType.EQUALS, "'=' expected following variable name in variable declaration.");
 			expr = parseExpr();
@@ -111,14 +100,21 @@ public class Parser {
 		return new VarDeclarationNode(varname, expr, isConst);
 	}
 
+	/**
+	 * Parse an expression into an expression tree
+	 *
+	 * Order of Precedence:
+	 * 1. Base expressions (literals, parentheses, keywords)
+	 * 2. Multiplication
+	 * 3. Addition
+	 */
 	private ExprNode parseExpr() {
 		return parseAddExpr();
 	}
 
 	/**
 	 * Parses an expression of the form:
-	 * <EXPR> + <EXPR>, or
-	 * <EXPR> - <EXPR>
+	 * ( expr ) ( + | - ) ( expr )
 	 * 
 	 * @return Expression
 	 */
@@ -134,9 +130,7 @@ public class Parser {
 
 	/**
 	 * Parses an expression of the form:
-	 * <EXPR> * <EXPR>, or
-	 * <EXPR> / <EXPR>, or
-	 * <EXPR> % <EXPR>
+	 * ( expr ) ( * | / | % ) ( expr )
 	 * 
 	 * @return Expression
 	 */
