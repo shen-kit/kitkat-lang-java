@@ -43,7 +43,7 @@ public class Scope {
 	 * Throws a RuntimeError if the variable has not yet been declared, or if it was
 	 * declared as constant.
 	 */
-	public void updateVar(String varname, RtVal val) {
+	public RtVal assignVar(String varname, RtVal val) {
 		Scope env = getVarEnv(varname);
 		if (env == null) {
 			throw new RuntimeException("Cannot update variable " + varname + ". Has not been declared.");
@@ -52,6 +52,7 @@ public class Scope {
 			throw new RuntimeException("Cannot update variable " + varname + ". Declared as constant");
 		}
 		env.variables.put(varname, val);
+		return val;
 	}
 
 	/**

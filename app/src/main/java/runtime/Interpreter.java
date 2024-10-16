@@ -2,6 +2,7 @@ package runtime;
 
 import frontend.ast.StatementNode;
 import frontend.ast.VarDeclarationNode;
+import frontend.ast.VarAssignmentNode;
 import frontend.ast.BinaryExpr;
 import frontend.ast.NodeType;
 import frontend.ast.NumberNode;
@@ -61,12 +62,28 @@ public class Interpreter {
 		return new RtNull();
 	}
 
+	/**
+	 * @param node  the node being interpreted (assignee, value)
+	 * @param scope the scope we are evaluating in
+	 * @return the assigned value, allows chaining assignments (e.g. x = y = z)
+	 */
+	private RtVal evaluateVarAssignment(VarAssignmentNode node, Scope scope) {
+		if (node.assignee.getType() != NodeType.IDENTIFIER)
+			throw new RuntimeException("Variable assignment has invalid assignee: " + node.assignee.toString());
+
+		String varname = ((IdentifierNode) node.assignee).symbol;
+		RtVal val = evaluate(node.expr, scope);
+		return scope.assignVar(varname, val);
+	}
+
 	public RtVal evaluate(StatementNode s, Scope scope) {
 		switch (s.getType()) {
 			case NodeType.PROGRAM:
 				return evaluateProgram((Program) s, scope);
 			case NodeType.VAR_DECLARATION:
 				return evaluateVarDeclaration((VarDeclarationNode) s, scope);
+			case NodeType.VAR_ASSIGNMENT:
+				return evaluateVarAssignment((VarAssignmentNode) s, scope);
 			case NodeType.BINARY_EXPR:
 				return evaluateBinaryExpr((BinaryExpr) s, scope);
 			case NodeType.NUMBER:

@@ -1,10 +1,11 @@
 package frontend.ast;
 
 public enum NodeType {
-	// statements
+	// statements -> return null
 	PROGRAM,
 	VAR_DECLARATION,
-	// expressions
+	// expressions -> return a value
+	VAR_ASSIGNMENT,
 	NULL,
 	BOOLEAN,
 	NUMBER,

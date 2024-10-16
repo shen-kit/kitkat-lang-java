@@ -15,10 +15,12 @@ import java.util.Deque;
 import frontend.ast.BinaryExpr;
 import frontend.ast.ExprNode;
 import frontend.ast.IdentifierNode;
+import frontend.ast.NodeType;
 import frontend.ast.NumberNode;
 import frontend.ast.Program;
 import frontend.ast.StatementNode;
 import frontend.ast.VarDeclarationNode;
+import frontend.ast.VarAssignmentNode;
 
 /**
  * 
@@ -76,7 +78,9 @@ public class Parser {
 			case TokenType.VAR_DECLARATION:
 				return parseVarDeclaration();
 			default:
-				return parseExpr();
+				StatementNode expr = parseExpr();
+				expect(TokenType.SEMICOLON, "Semicolon expected after expression.");
+				return expr;
 		}
 	}
 
@@ -96,7 +100,7 @@ public class Parser {
 			expr = parseExpr();
 		}
 		// var declaration must be terminated with a semicolon
-		expect(TokenType.SEMICOLON, "Variable declarations must be terminated by a semicolon");
+		expect(TokenType.SEMICOLON, "Semicolon expected after expression.");
 		return new VarDeclarationNode(varname, expr, isConst);
 	}
 
@@ -107,9 +111,25 @@ public class Parser {
 	 * 1. Base expressions (literals, parentheses, keywords)
 	 * 2. Multiplication
 	 * 3. Addition
+	 * 4. Variable assignment
 	 */
 	private ExprNode parseExpr() {
-		return parseAddExpr();
+		return parseAssignmentExpr();
+	}
+
+	/**
+	 * Parses a variable assignment of the form:
+	 * ( assignee ) = ( expr )
+	 * 
+	 * @return Expression
+	 */
+	private ExprNode parseAssignmentExpr() {
+		ExprNode left = parseAddExpr();
+		if (at().type == TokenType.EQUALS) {
+			eat(); // advance past equals token
+			return new VarAssignmentNode(left, parseExpr());
+		}
+		return left;
 	}
 
 	/**
