@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 
 import frontend.ast.BinaryExpr;
-import frontend.ast.BooleanNode;
 import frontend.ast.ExprNode;
 import frontend.ast.IdentifierNode;
 import frontend.ast.NumberNode;
@@ -132,8 +131,6 @@ public class Parser {
 				return new IdentifierNode(t.value);
 			case TokenType.NUMBER:
 				return new NumberNode(Integer.parseInt(t.value));
-			case TokenType.BOOLEAN:
-				return new BooleanNode(t.value.equals("true"));
 			case TokenType.OPEN_PAREN:
 				ExprNode e = parseExpr();
 				expect(TokenType.CLOSE_PAREN, "must close brackets after opening");

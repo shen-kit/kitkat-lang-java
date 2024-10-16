@@ -4,7 +4,6 @@ import frontend.ast.StatementNode;
 import frontend.ast.BinaryExpr;
 import frontend.ast.NodeType;
 import frontend.ast.NumberNode;
-import frontend.ast.BooleanNode;
 import frontend.ast.IdentifierNode;
 import frontend.ast.Program;
 
@@ -56,8 +55,6 @@ public class Interpreter {
 				return evaluateBinaryExpr((BinaryExpr) s, scope);
 			case NodeType.NUMBER:
 				return new RtNumber(((NumberNode) s).getValue());
-			case NodeType.BOOLEAN:
-				return new RtBool(((BooleanNode) s).val);
 			case NodeType.IDENTIFIER:
 				return evaluateIdentifier((IdentifierNode) s, scope);
 
