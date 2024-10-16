@@ -18,7 +18,11 @@ import frontend.ast.IdentifierNode;
 import frontend.ast.NumberNode;
 import frontend.ast.Program;
 import frontend.ast.StatementNode;
+import frontend.ast.VarDeclarationNode;
 
+/**
+ * 
+ */
 public class Parser {
 	private Deque<Token> tokens = new ArrayDeque<>();
 
@@ -76,7 +80,35 @@ public class Parser {
 	 */
 
 	private StatementNode parseStatement() {
-		return parseExpr();
+		switch (at().type) {
+			case TokenType.VAR_DECLARATION:
+				return parseVarDeclaration();
+			default:
+				return parseExpr();
+		}
+	}
+
+	/**
+	 * Parse a variable declaration of any of the following structures:
+	 * let <varname> = <expr>;
+	 * const <varname> = <expr>;
+	 * let <varname>;
+	 * 
+	 * @return VarDeclarationNode if successful
+	 */
+	private StatementNode parseVarDeclaration() {
+		boolean isConst = eat().value.equals("const");
+		String varname = eat().value;
+		ExprNode expr = new IdentifierNode("null");
+		// parse '=' and the following expression if variable declared as const
+		// (required), or let but with instant initialisation
+		if (isConst || at().type == TokenType.EQUALS) {
+			expect(TokenType.EQUALS, "'=' expected following variable name in variable declaration.");
+			expr = parseExpr();
+		}
+		// var declaration must be terminated with a semicolon
+		expect(TokenType.SEMICOLON, "Variable declarations must be terminated by a semicolon");
+		return new VarDeclarationNode(varname, expr, isConst);
 	}
 
 	private ExprNode parseExpr() {

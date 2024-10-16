@@ -1,12 +1,16 @@
 package runtime;
 
 import frontend.ast.StatementNode;
+import frontend.ast.VarDeclarationNode;
 import frontend.ast.BinaryExpr;
 import frontend.ast.NodeType;
 import frontend.ast.NumberNode;
 import frontend.ast.IdentifierNode;
 import frontend.ast.Program;
 
+/**
+ * 
+ */
 public class Interpreter {
 
 	public RtVal evaluateProgram(Program p, Scope scope) {
@@ -47,10 +51,22 @@ public class Interpreter {
 		return scope.getVar(identifier.symbol);
 	}
 
+	/**
+	 * @param node  the node being interpreted (contains varname, value, isConst)
+	 * @param scope the scope we are evaluating in
+	 * @return null
+	 */
+	private RtVal evaluateVarDeclaration(VarDeclarationNode node, Scope scope) {
+		scope.declareVar(node.varname, evaluate(node.value, scope), node.isConst);
+		return new RtNull();
+	}
+
 	public RtVal evaluate(StatementNode s, Scope scope) {
 		switch (s.getType()) {
 			case NodeType.PROGRAM:
 				return evaluateProgram((Program) s, scope);
+			case NodeType.VAR_DECLARATION:
+				return evaluateVarDeclaration((VarDeclarationNode) s, scope);
 			case NodeType.BINARY_EXPR:
 				return evaluateBinaryExpr((BinaryExpr) s, scope);
 			case NodeType.NUMBER:

@@ -25,13 +25,15 @@ public class App {
 		Scanner s = new Scanner(System.in);
 
 		Scope globalScope = new Scope(null);
-		globalScope.declareVar("x", new RtNumber(5));
-		globalScope.declareVar("null", new RtNull());
-		globalScope.declareVar("true", new RtBool(true));
-		globalScope.declareVar("false", new RtBool(false));
-
 		Scope innerScope = new Scope(globalScope);
-		innerScope.declareVar("y", new RtNumber(10));
+
+		// constants
+		globalScope.declareVar("null", new RtNull(), true);
+		globalScope.declareVar("true", new RtBool(true), true);
+		globalScope.declareVar("false", new RtBool(false), true);
+
+		globalScope.declareVar("x", new RtNumber(5), false);
+		innerScope.declareVar("y", new RtNumber(10), false);
 
 		while (true) {
 			System.out.print("> ");

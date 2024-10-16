@@ -1,10 +1,13 @@
 package frontend.ast;
 
 public enum NodeType {
-  PROGRAM,
-  NUMBER,
-  BOOLEAN,
-  NULL,
-  IDENTIFIER,
-  BINARY_EXPR
+	// statements
+	PROGRAM,
+	VAR_DECLARATION,
+	// expressions
+	NULL,
+	BOOLEAN,
+	NUMBER,
+	BINARY_EXPR,
+	IDENTIFIER,
 }

@@ -4,9 +4,9 @@ public enum TokenType {
 	// literals
 	NUMBER,
 	IDENTIFIER,
+	SEMICOLON,
 	// keywords
-	LET,
-	CONST,
+	VAR_DECLARATION,
 	// operators / groupings
 	BINARY_OPERATOR,
 	EQUALS,
