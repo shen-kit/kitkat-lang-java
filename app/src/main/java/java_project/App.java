@@ -3,51 +3,72 @@
  */
 package java_project;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 import frontend.Parser;
 import frontend.ast.Program;
 import runtime.Scope;
 import runtime.Interpreter;
-import runtime.RtBool;
-import runtime.RtNull;
-import runtime.RtNumber;
 import runtime.RtVal;
 
 public class App {
-	public static void main(String[] args) {
-		System.out.println("========================================");
-		System.out.println("               Repl v0.1                ");
-		System.out.println("           Press 'q' to exit            ");
-		System.out.println("========================================\n");
+  /**
+   * run with no cmdline-args to access repl, or include a file to execute
+   */
+  public static void main(String[] args) {
+    if (args.length == 1)
+      runFile(args[0]);
+    else
+      repl();
+  }
 
-		Parser p = new Parser();
-		Scanner s = new Scanner(System.in);
+  private static void runFile(String fname) {
+    Parser p = new Parser();
+    Interpreter interpreter = new Interpreter();
 
-		Scope globalScope = new Scope(null);
-		Scope innerScope = new Scope(globalScope);
+    Scope globalScope = new Scope(null);
 
-		// constants
-		globalScope.declareVar("null", new RtNull(), true);
-		globalScope.declareVar("true", new RtBool(true), true);
-		globalScope.declareVar("false", new RtBool(false), true);
+    try {
+      File f = new File(fname);
+      Scanner s = new Scanner(f);
+      while (s.hasNextLine()) {
+        String line = s.nextLine();
+        Program program = p.createAST(line);
+        RtVal val = interpreter.evaluate(program, globalScope);
+        System.out.println(val);
+      }
+      s.close();
 
-		globalScope.declareVar("x", new RtNumber(5), false);
-		innerScope.declareVar("y", new RtNumber(10), false);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+  }
 
-		while (true) {
-			System.out.print("> ");
-			String input = s.nextLine();
-			if (input.equals("q")) {
-				break;
-			}
-			Program program = p.createAST(input);
-			// System.out.println(program);
+  private static void repl() {
+    System.out.println("========================================");
+    System.out.println("               Repl v0.1                ");
+    System.out.println("           Press 'q' to exit            ");
+    System.out.println("========================================\n");
 
-			Interpreter interp = new Interpreter();
-			RtVal val = interp.evaluate(program, innerScope);
-			System.out.println(val);
-		}
-		s.close();
-	}
+    Parser p = new Parser();
+    Scanner s = new Scanner(System.in);
+    Scope globalScope = new Scope(null);
+
+    while (true) {
+      System.out.print("> ");
+      String input = s.nextLine();
+      if (input.equals("q")) {
+        break;
+      }
+      Program program = p.createAST(input);
+      // System.out.println(program);
+
+      Interpreter interp = new Interpreter();
+      RtVal val = interp.evaluate(program, globalScope);
+      System.out.println(val);
+    }
+    s.close();
+  }
 }
