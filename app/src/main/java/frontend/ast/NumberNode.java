@@ -14,6 +14,6 @@ public class NumberNode extends ExprNode {
 
 	@Override
 	public String toString() {
-		return String.format("number: %d", this.value);
+		return String.valueOf(this.value);
 	}
 }

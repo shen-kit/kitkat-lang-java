@@ -9,7 +9,8 @@ class Lexer {
 
 	private static final Map<String, TokenType> reservedKeywords = Map.ofEntries(
 			entry("let", TokenType.VAR_DECLARATION),
-			entry("const", TokenType.VAR_DECLARATION));
+			entry("const", TokenType.VAR_DECLARATION),
+			entry("print", TokenType.PRINT));
 
 	private static boolean isSkippable(char c) {
 		return c == ' ' || c == '\n' || c == '\t';
@@ -41,8 +42,12 @@ class Lexer {
 			c = q.poll();
 			switch (c) {
 				case ';' -> tokens.add(token(c, TokenType.SEMICOLON));
+				case ':' -> tokens.add(token(c, TokenType.COLON));
+				case ',' -> tokens.add(token(c, TokenType.COMMA));
 				case '(' -> tokens.add(token(c, TokenType.OPEN_PAREN));
 				case ')' -> tokens.add(token(c, TokenType.CLOSE_PAREN));
+				case '{' -> tokens.add(token(c, TokenType.OPEN_BRACE));
+				case '}' -> tokens.add(token(c, TokenType.CLOSE_BRACE));
 				case '=' -> tokens.add(token(c, TokenType.EQUALS));
 				case '+', '-', '*', '/', '%' -> tokens.add(token(c, TokenType.BINARY_OPERATOR));
 				default -> {

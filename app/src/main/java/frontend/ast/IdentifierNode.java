@@ -10,6 +10,6 @@ public class IdentifierNode extends ExprNode {
 
 	@Override
 	public String toString() {
-		return "identifier: " + this.symbol;
+		return symbol;
 	}
 }

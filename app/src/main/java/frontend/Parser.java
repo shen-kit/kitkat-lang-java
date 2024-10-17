@@ -11,13 +11,16 @@ package frontend;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 
 import frontend.ast.BinaryExpr;
 import frontend.ast.ExprNode;
 import frontend.ast.IdentifierNode;
-import frontend.ast.NodeType;
 import frontend.ast.NumberNode;
+import frontend.ast.ObjectNode;
+import frontend.ast.PrintNode;
 import frontend.ast.Program;
+import frontend.ast.PropertyNode;
 import frontend.ast.StatementNode;
 import frontend.ast.VarDeclarationNode;
 import frontend.ast.VarAssignmentNode;
@@ -35,6 +38,7 @@ public class Parser {
 	 */
 	public Program createAST(String sourceCode) {
 		this.tokens = Lexer.tokenise(sourceCode);
+		// tokens.stream().forEach((Token t) -> System.out.println(t.type));
 		Program p = new Program(new ArrayList<>());
 
 		while (this.tokens.peek().type != TokenType.EOF) {
@@ -74,14 +78,19 @@ public class Parser {
 	}
 
 	private StatementNode parseStatement() {
+		StatementNode stmt;
 		switch (at().type) {
 			case TokenType.VAR_DECLARATION:
-				return parseVarDeclaration();
+				stmt = parseVarDeclaration();
+				break;
+			case TokenType.PRINT:
+				stmt = parsePrintStmt();
+				break;
 			default:
-				StatementNode expr = parseExpr();
-				expect(TokenType.SEMICOLON, "Semicolon expected after expression.");
-				return expr;
+				stmt = parseExpr();
 		}
+		expect(TokenType.SEMICOLON, "Semicolon expected after expression.");
+		return stmt;
 	}
 
 	/**
@@ -99,9 +108,21 @@ public class Parser {
 			expect(TokenType.EQUALS, "'=' expected following variable name in variable declaration.");
 			expr = parseExpr();
 		}
-		// var declaration must be terminated with a semicolon
-		expect(TokenType.SEMICOLON, "Semicolon expected after expression.");
 		return new VarDeclarationNode(varname, expr, isConst);
+	}
+
+	/**
+	 * Parses a variable declaration of the form:
+	 * ( let | const ) ( varname ) = ( expr );
+	 * 
+	 * @return VarDeclarationNode if successful
+	 */
+	private StatementNode parsePrintStmt() {
+		eat(); // eat PRINT token
+		expect(TokenType.OPEN_PAREN, "print must be followed by an open parenthesis");
+		ExprNode expr = parseExpr();
+		expect(TokenType.CLOSE_PAREN, "open bracket not closed");
+		return new PrintNode(expr);
 	}
 
 	/**
@@ -111,7 +132,8 @@ public class Parser {
 	 * 1. Base expressions (literals, parentheses, keywords)
 	 * 2. Multiplication
 	 * 3. Addition
-	 * 4. Variable assignment
+	 * 4. Objects
+	 * 5. Variable assignment
 	 */
 	private ExprNode parseExpr() {
 		return parseAssignmentExpr();
@@ -124,12 +146,37 @@ public class Parser {
 	 * @return Expression
 	 */
 	private ExprNode parseAssignmentExpr() {
-		ExprNode left = parseAddExpr();
+		ExprNode left = parseObject();
 		if (at().type == TokenType.EQUALS) {
 			eat(); // advance past equals token
 			return new VarAssignmentNode(left, parseExpr());
 		}
 		return left;
+	}
+
+	/**
+	 * Parses an object of the form:
+	 * { ( key ): ( value), ... }
+	 */
+	private ExprNode parseObject() {
+		if (at().type != TokenType.OPEN_BRACE) {
+			return parseAddExpr();
+		}
+
+		this.eat(); // consume {
+		List<PropertyNode> properties = new ArrayList<>();
+
+		while (at().type != TokenType.EOF && at().type != TokenType.CLOSE_BRACE) {
+
+			String key = expect(TokenType.IDENTIFIER, "identifier expected").value;
+			expect(TokenType.COLON, "Colon (:) missing after key in object definition");
+
+			ExprNode value = parseExpr();
+			expect(TokenType.COMMA, "Comma missing after property assignment");
+			properties.add(new PropertyNode(key, value));
+		}
+		expect(TokenType.CLOSE_BRACE, "Object not closed");
+		return new ObjectNode(properties);
 	}
 
 	/**

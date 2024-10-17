@@ -15,7 +15,7 @@ public class VarDeclarationNode extends StatementNode {
 
 	@Override
 	public String toString() {
-		return "VarDeclarationNode";
+		return String.format("VarDeclaration: %s = %s", varname, value);
 	}
 
 }

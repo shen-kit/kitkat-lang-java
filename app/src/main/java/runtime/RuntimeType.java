@@ -7,6 +7,7 @@
 package runtime;
 
 public enum RuntimeType {
+	OBJECT,
 	NUMBER,
 	BOOLEAN,
 	NULL
