@@ -33,6 +33,10 @@ class Lexer {
     return new Token("" + value, type);
   }
 
+  private static boolean isValidIdentifierChar(char c) {
+    return Character.isLetter(c) || c == '_';
+  }
+
   static Deque<Token> tokenise(String sourceCode) {
     Deque<Token> tokens = new ArrayDeque<>();
     char[] src = sourceCode.toCharArray();
@@ -58,6 +62,11 @@ class Lexer {
         case '}' -> tokens.add(token(c, TokenType.CLOSE_BRACE));
         case '=' -> tokens.add(token(c, TokenType.EQUALS));
         case '+', '-', '*', '/', '%' -> tokens.add(token(c, TokenType.BINARY_OPERATOR));
+        // comments
+        case '#' -> {
+          while (!q.isEmpty() && q.peek() != '\n')
+            q.poll();
+        }
         default -> {
 
           /* multi-character tokens */
@@ -84,9 +93,9 @@ class Lexer {
           }
 
           // identifier
-          else if (Character.isLetter(c)) {
+          else if (isValidIdentifierChar(c)) {
             String word = "" + c;
-            while (!q.isEmpty() && Character.isLetter(q.peek())) {
+            while (!q.isEmpty() && isValidIdentifierChar(q.peek())) {
               word += q.poll();
             }
 

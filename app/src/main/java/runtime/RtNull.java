@@ -8,7 +8,7 @@ public class RtNull extends RtVal {
 
 	@Override
 	public String toString() {
-		return "RtNull";
+		return "null";
 	}
 
 }

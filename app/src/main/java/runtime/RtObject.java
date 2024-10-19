@@ -13,11 +13,7 @@ public class RtObject extends RtVal {
 
 	@Override
 	public String toString() {
-		String res = "{\n";
-		for (Map.Entry<String, RtVal> e : props.entrySet()) {
-			res += String.format("%s: %s\n", e.getKey(), e.getValue());
-		}
-		return res + '}';
+		return props.toString();
 	}
 
 }

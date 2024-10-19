@@ -24,8 +24,8 @@ import frontend.ast.Program;
 import frontend.ast.PropertyNode;
 import frontend.ast.StatementNode;
 import frontend.ast.StringNode;
-import frontend.ast.VarDeclarationNode;
 import frontend.ast.VarAssignmentNode;
+import frontend.ast.VarDeclarationNode;
 
 /**
  * 
@@ -85,17 +85,11 @@ public class Parser {
    * @return StatementNode for the statement
    */
   private StatementNode parseStatement() {
-    StatementNode stmt;
-    switch (at().type) {
-      case TokenType.VAR_DECLARATION:
-        stmt = parseVarDeclaration();
-        break;
-      case TokenType.PRINT:
-        stmt = parsePrintStmt();
-        break;
-      default:
-        stmt = parseExpr();
-    }
+    StatementNode stmt = switch (at().type) {
+      case TokenType.VAR_DECLARATION -> parseVarDeclaration();
+      case TokenType.PRINT -> parsePrintStmt();
+      default -> parseExpr();
+    };
     expect(TokenType.SEMICOLON, "Semicolon expected after expression.");
     return stmt;
   }
@@ -239,18 +233,15 @@ public class Parser {
   private ExprNode parseBaseExpr() {
     Token t = eat();
     switch (t.type) {
-      case TokenType.IDENTIFIER:
-        return new IdentifierNode(t.value);
-      case TokenType.NUMBER:
-        return new NumberNode(Integer.parseInt(t.value));
-      case TokenType.OPEN_PAREN:
-        ExprNode e = parseExpr();
-        expect(TokenType.CLOSE_PAREN, "must close brackets after opening");
-        return e;
-      case TokenType.STRING:
-        return new StringNode(t.value);
-      default:
-        throw new RuntimeException("Could not parse token: " + t.type + ", value = " + t.value);
+      case TokenType.IDENTIFIER -> { return new IdentifierNode(t.value); }
+      case TokenType.NUMBER -> { return new NumberNode(Integer.parseInt(t.value)); }
+      case TokenType.STRING -> { return new StringNode(t.value); }
+      case TokenType.OPEN_PAREN -> {
+          ExprNode e = parseExpr();
+          expect(TokenType.CLOSE_PAREN, "must close brackets after opening");
+          return e;
+          }
+      default -> throw new RuntimeException("Could not parse token: " + t.type + ", value = " + t.value);
     }
   }
 }

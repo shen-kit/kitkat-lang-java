@@ -10,6 +10,6 @@ public class RtNumber extends RtVal {
 
 	@Override
 	public String toString() {
-		return "RtNumber: " + String.valueOf(val);
+		return String.valueOf(val);
 	}
 }

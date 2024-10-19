@@ -5,13 +5,13 @@ package java_project;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import frontend.Parser;
 import frontend.ast.Program;
-import runtime.Scope;
 import runtime.Interpreter;
-import runtime.RtVal;
+import runtime.Scope;
 
 public class App {
   /**
@@ -39,7 +39,7 @@ public class App {
       Program ast = p.createAST(str);
       interpreter.evaluate(ast, globalScope);
     } catch (FileNotFoundException e) {
-      e.printStackTrace();
+      System.err.println("File " + fname + " not found. Exiting.");
     }
 
   }
@@ -50,22 +50,22 @@ public class App {
     System.out.println("           Press 'q' to exit            ");
     System.out.println("========================================\n");
 
-    Parser p = new Parser();
+    Parser parser = new Parser();
+    Interpreter interpreter = new Interpreter();
     Scanner s = new Scanner(System.in);
-    Scope globalScope = new Scope(null);
+    Scope env = new Scope(null);
 
+    // break with EOF (Ctrl+D)
     while (true) {
       System.out.print("> ");
-      String input = s.nextLine();
-      if (input.equals("q")) {
+      try {
+        String input = s.nextLine();
+        Program program = parser.createAST(input);
+        System.out.println(interpreter.evaluate(program, env));
+      } catch (NoSuchElementException e) {
+        System.out.println("\n\nEOF found, shutting down repl.\n");
         break;
       }
-      Program program = p.createAST(input);
-      // System.out.println(program);
-
-      Interpreter interp = new Interpreter();
-      RtVal val = interp.evaluate(program, globalScope);
-      System.out.println(val);
     }
     s.close();
   }

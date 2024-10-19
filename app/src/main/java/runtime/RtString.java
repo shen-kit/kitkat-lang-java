@@ -11,6 +11,6 @@ public class RtString extends RtVal {
 
   @Override
   public String toString() {
-    return '"' + value + '"';
+    return value;
   }
 }
