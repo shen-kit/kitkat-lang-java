@@ -23,6 +23,7 @@ import frontend.ast.PrintNode;
 import frontend.ast.Program;
 import frontend.ast.PropertyNode;
 import frontend.ast.StatementNode;
+import frontend.ast.StringNode;
 import frontend.ast.VarDeclarationNode;
 import frontend.ast.VarAssignmentNode;
 
@@ -231,7 +232,7 @@ public class Parser {
 
   /**
    * Parses a base expression (cannot be broken down further):
-   * identifiers, numbers, booleans, brackets
+   * identifiers, numbers, string literals, booleans, brackets
    * 
    * @return Expression
    */
@@ -246,6 +247,8 @@ public class Parser {
         ExprNode e = parseExpr();
         expect(TokenType.CLOSE_PAREN, "must close brackets after opening");
         return e;
+      case TokenType.STRING:
+        return new StringNode(t.value);
       default:
         throw new RuntimeException("Could not parse token: " + t.type + ", value = " + t.value);
     }

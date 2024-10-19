@@ -62,13 +62,29 @@ class Lexer {
 
           /* multi-character tokens */
 
-          if (Character.isDigit(c)) { // number
+          // string literal
+          if (c == '"') {
+            String s = "";
+            while (!q.isEmpty() && q.peek() != '"') {
+              s += q.poll();
+            }
+            if (q.isEmpty())
+              throw new RuntimeException("Open quote never closed.");
+            q.poll(); // eat closing quotation mark
+            tokens.add(token(s, TokenType.STRING));
+          }
+
+          // number
+          else if (Character.isDigit(c)) {
             String num = "" + c;
             while (!q.isEmpty() && Character.isDigit(q.peek())) {
               num += q.poll();
             }
             tokens.add(token(num, TokenType.NUMBER));
-          } else if (Character.isLetter(c)) { // identifier
+          }
+
+          // identifier
+          else if (Character.isLetter(c)) {
             String word = "" + c;
             while (!q.isEmpty() && Character.isLetter(q.peek())) {
               word += q.poll();
@@ -79,7 +95,9 @@ class Lexer {
             } else {
               tokens.add(token(word, TokenType.IDENTIFIER));
             }
-          } else if (!isSkippable(c)) {
+          }
+
+          else if (!isSkippable(c)) {
             System.out.println("unrecognised character found: " + c);
           }
         }

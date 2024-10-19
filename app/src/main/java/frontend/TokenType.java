@@ -6,6 +6,7 @@ public enum TokenType {
   IDENTIFIER,
   SEMICOLON, COLON,
   COMMA, DOT,
+  STRING,
   // keywords
   VAR_DECLARATION,
   PRINT,

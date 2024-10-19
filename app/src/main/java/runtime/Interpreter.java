@@ -1,21 +1,14 @@
 package runtime;
 
 import frontend.ast.StatementNode;
+import frontend.ast.StringNode;
 import frontend.ast.VarDeclarationNode;
 import frontend.ast.VarAssignmentNode;
 
 import java.util.Map;
 import java.util.HashMap;
 
-import frontend.ast.BinaryExpr;
-import frontend.ast.NodeType;
-import frontend.ast.NumberNode;
-import frontend.ast.ObjectNode;
-import frontend.ast.PrintNode;
-import frontend.ast.IdentifierNode;
-import frontend.ast.MemberNode;
-import frontend.ast.Program;
-import frontend.ast.PropertyNode;
+import frontend.ast.*;
 
 public class Interpreter {
 
@@ -30,11 +23,22 @@ public class Interpreter {
   public RtVal evaluateBinaryExpr(BinaryExpr expr, Scope scope) {
     RtVal left = evaluate(expr.left, scope);
     RtVal right = evaluate(expr.right, scope);
+
     if (left.type == RuntimeType.NUMBER && right.type == RuntimeType.NUMBER) {
       return evaluateBinaryNumberExpr(((RtNumber) left).val, ((RtNumber) right).val, expr.operator);
-    } else {
-      return new RtNull();
     }
+    if (expr.operator.equals("+") && left.type == RuntimeType.STRING && right.type == RuntimeType.STRING) {
+      String newValue = ((RtString) left).value + ((RtString) right).value;
+      return new RtString(newValue);
+    }
+    if (expr.operator.equals("*") && left.type == RuntimeType.STRING && right.type == RuntimeType.NUMBER) {
+      String newValue = "";
+      for (int i = 0; i < ((RtNumber) right).val; i++) {
+        newValue += ((RtString) left).value;
+      }
+      return new RtString(newValue);
+    }
+    return new RtNull();
   }
 
   private RtVal evaluateBinaryNumberExpr(int l, int r, String op) {
@@ -125,6 +129,8 @@ public class Interpreter {
         return new RtNumber(((NumberNode) s).getValue());
       case NodeType.MEMBER:
         return evaluateMember((MemberNode) s, scope);
+      case NodeType.STRING:
+        return new RtString(((StringNode) s).value);
       case NodeType.IDENTIFIER:
         return evaluateIdentifier((IdentifierNode) s, scope);
 
