@@ -63,6 +63,11 @@ public class Scope {
     return val;
   }
 
+  public RtVal assignVar(RtObject object, String key, RtVal val) {
+    object.props.put(key, val);
+    return val;
+  }
+
   /**
    * Get the value of a variable from the variable name
    * Throws a RuntimeException if the variable has not been declared
@@ -72,7 +77,7 @@ public class Scope {
     return env.variables.get(varname);
   }
 
-  public RtVal getMemberVal(RtObject object, String key) {
+  public RtVal getVar(RtObject object, String key) {
     if (object.props.containsKey(key))
       return object.props.get(key);
     else

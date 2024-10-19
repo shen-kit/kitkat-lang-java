@@ -58,9 +58,9 @@ public class Interpreter {
   }
 
   private RtVal evaluateMember(MemberNode node, Scope scope) {
-    RtObject obj = (RtObject) evaluate(node.parent, scope);
-    IdentifierNode ident = (IdentifierNode) node.key;
-    return scope.getMemberVal(obj, ident.symbol);
+    RtObject obj = (RtObject) evaluate(node.left, scope);
+    IdentifierNode ident = (IdentifierNode) node.right;
+    return scope.getVar(obj, ident.symbol);
   }
 
   /**
@@ -79,12 +79,19 @@ public class Interpreter {
    * @return the assigned value, allows chaining assignments (e.g. x = y = z)
    */
   private RtVal evaluateVarAssignment(VarAssignmentNode node, Scope scope) {
-    if (node.assignee.getType() != NodeType.IDENTIFIER)
-      throw new RuntimeException("Variable assignment has invalid assignee: " + node.assignee.toString());
+    if (node.assignee.getType() == NodeType.IDENTIFIER) { /* literal variable */
+      String varname = ((IdentifierNode) node.assignee).symbol;
+      RtVal val = evaluate(node.expr, scope);
+      return scope.assignVar(varname, val);
+    } else if (node.assignee.getType() == NodeType.MEMBER) {
+      MemberNode mNode = (MemberNode) node.assignee;
+      // object whose property to change (recursive)
+      RtObject obj = (RtObject) evaluate(mNode.left, scope);
+      IdentifierNode ident = (IdentifierNode) mNode.right;
+      return scope.assignVar(obj, ident.symbol, evaluate(node.expr, scope));
+    }
+    throw new RuntimeException("Variable assignment has invalid assignee: " + node.assignee.toString());
 
-    String varname = ((IdentifierNode) node.assignee).symbol;
-    RtVal val = evaluate(node.expr, scope);
-    return scope.assignVar(varname, val);
   }
 
   private RtObject evaluateObject(ObjectNode node, Scope s) {

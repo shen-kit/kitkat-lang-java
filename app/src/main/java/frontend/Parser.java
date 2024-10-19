@@ -17,7 +17,6 @@ import frontend.ast.BinaryExpr;
 import frontend.ast.ExprNode;
 import frontend.ast.IdentifierNode;
 import frontend.ast.MemberNode;
-import frontend.ast.NodeType;
 import frontend.ast.NumberNode;
 import frontend.ast.ObjectNode;
 import frontend.ast.PrintNode;
@@ -223,11 +222,9 @@ public class Parser {
     ExprNode left = parseBaseExpr();
     while (at().type == TokenType.DOT) {
       eat(); // consume the dot
-      ExprNode right = parseBaseExpr(); // identifier
-      if (right.getType() != NodeType.IDENTIFIER) {
-        throw new RuntimeException("Expected identifier following dot operator");
-      }
-      left = new MemberNode(left, right);
+      Token t = expect(TokenType.IDENTIFIER, "Identifier expected following dot operator");
+      IdentifierNode right = new IdentifierNode(t.value);
+      left = new MemberNode(left, (IdentifierNode) right);
     }
     return left;
   }
