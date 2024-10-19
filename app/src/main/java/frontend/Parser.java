@@ -16,6 +16,8 @@ import java.util.List;
 import frontend.ast.BinaryExpr;
 import frontend.ast.ExprNode;
 import frontend.ast.IdentifierNode;
+import frontend.ast.MemberNode;
+import frontend.ast.NodeType;
 import frontend.ast.NumberNode;
 import frontend.ast.ObjectNode;
 import frontend.ast.PrintNode;
@@ -135,10 +137,11 @@ public class Parser {
    *
    * Order of Precedence:
    * 1. Base expressions (literals, parentheses, keywords)
-   * 2. Multiplication
-   * 3. Addition
-   * 4. Objects
-   * 5. Variable assignment
+   * 2. Members (object.member || object[memberExpr])
+   * 3. Multiplication
+   * 4. Addition
+   * 5. Objects
+   * 6. Variable assignment
    */
   private ExprNode parseExpr() {
     return parseAssignmentExpr();
@@ -207,11 +210,24 @@ public class Parser {
    * @return Expression
    */
   private ExprNode parseMultiplyExpr() {
-    ExprNode left = parseBaseExpr();
+    ExprNode left = parseMemberExpr();
     while (at().value.equals("*") || at().value.equals("/") || at().value.equals("%")) {
       String op = eat().value;
-      ExprNode right = parseBaseExpr();
+      ExprNode right = parseMemberExpr();
       left = new BinaryExpr(left, right, op);
+    }
+    return left;
+  }
+
+  private ExprNode parseMemberExpr() {
+    ExprNode left = parseBaseExpr();
+    while (at().type == TokenType.DOT) {
+      eat(); // consume the dot
+      ExprNode right = parseBaseExpr(); // identifier
+      if (right.getType() != NodeType.IDENTIFIER) {
+        throw new RuntimeException("Expected identifier following dot operator");
+      }
+      left = new MemberNode(left, right);
     }
     return left;
   }

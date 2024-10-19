@@ -48,9 +48,12 @@ class Lexer {
         case ';' -> tokens.add(token(c, TokenType.SEMICOLON));
         case ':' -> tokens.add(token(c, TokenType.COLON));
         case ',' -> tokens.add(token(c, TokenType.COMMA));
+        case '.' -> tokens.add(token(c, TokenType.DOT));
         // operators / groupings
         case '(' -> tokens.add(token(c, TokenType.OPEN_PAREN));
         case ')' -> tokens.add(token(c, TokenType.CLOSE_PAREN));
+        case '[' -> tokens.add(token(c, TokenType.OPEN_BRACKET));
+        case ']' -> tokens.add(token(c, TokenType.CLOSE_BRACKET));
         case '{' -> tokens.add(token(c, TokenType.OPEN_BRACE));
         case '}' -> tokens.add(token(c, TokenType.CLOSE_BRACE));
         case '=' -> tokens.add(token(c, TokenType.EQUALS));
