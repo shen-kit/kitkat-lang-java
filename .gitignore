@@ -6,3 +6,6 @@ build
 
 # ignore .class files
 app/bin/
+
+# ignore test files (.kitkat extension)
+*.kitkat
