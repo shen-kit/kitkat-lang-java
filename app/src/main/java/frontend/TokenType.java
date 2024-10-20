@@ -13,6 +13,7 @@ public enum TokenType {
   // operators / groupings
   EQUALS,
   BINARY_OPERATOR,
+  COMPARATOR, // > / < / == / != / >= / <=
   OPEN_PAREN, CLOSE_PAREN,
   OPEN_BRACKET, CLOSE_BRACKET,
   OPEN_BRACE, CLOSE_BRACE,

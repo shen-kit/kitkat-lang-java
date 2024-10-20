@@ -14,6 +14,7 @@ import java.util.Deque;
 import java.util.List;
 
 import frontend.ast.BinaryExpr;
+import frontend.ast.ComparatorNode;
 import frontend.ast.ExprNode;
 import frontend.ast.IdentifierNode;
 import frontend.ast.MemberNode;
@@ -40,7 +41,7 @@ public class Parser {
    */
   public Program createAST(String sourceCode) {
     this.tokens = Lexer.tokenise(sourceCode);
-    // tokens.stream().forEach((Token t) -> System.out.println(t.type));
+    // tokens.stream().forEach((Token t) -> System.out.println(t.value));
     Program p = new Program(new ArrayList<>());
 
     while (this.tokens.peek().type != TokenType.EOF) {
@@ -134,8 +135,9 @@ public class Parser {
    * 2. Members (object.member || object[memberExpr])
    * 3. Multiplication
    * 4. Addition
-   * 5. Objects
-   * 6. Variable assignment
+   * 5. Comparators
+   * 6. Objects
+   * 7. Variable assignment
    */
   private ExprNode parseExpr() {
     return parseAssignmentExpr();
@@ -162,7 +164,7 @@ public class Parser {
    */
   private ExprNode parseObject() {
     if (at().type != TokenType.OPEN_BRACE) {
-      return parseAddExpr();
+      return parseComparatorExpr();
     }
 
     this.eat(); // consume {
@@ -173,12 +175,22 @@ public class Parser {
       String key = expect(TokenType.IDENTIFIER, "identifier expected").value;
       expect(TokenType.COLON, "Colon (:) missing after key in object definition");
 
-      ExprNode value = parseExpr();
+      ExprNode value = parseObject();
       expect(TokenType.COMMA, "Comma missing after property assignment");
       properties.add(new PropertyNode(key, value));
     }
     expect(TokenType.CLOSE_BRACE, "Object not closed");
     return new ObjectNode(properties);
+  }
+
+  private ExprNode parseComparatorExpr() {
+    ExprNode left = parseAddExpr();
+    while (at().type == TokenType.COMPARATOR) {
+      String comparator = eat().value;
+      ExprNode right = parseAddExpr();
+      left = new ComparatorNode(left, right, comparator);
+    }
+    return left;
   }
 
   /**
@@ -233,14 +245,20 @@ public class Parser {
   private ExprNode parseBaseExpr() {
     Token t = eat();
     switch (t.type) {
-      case TokenType.IDENTIFIER -> { return new IdentifierNode(t.value); }
-      case TokenType.NUMBER -> { return new NumberNode(Integer.parseInt(t.value)); }
-      case TokenType.STRING -> { return new StringNode(t.value); }
+      case TokenType.IDENTIFIER -> {
+        return new IdentifierNode(t.value);
+      }
+      case TokenType.NUMBER -> {
+        return new NumberNode(Integer.parseInt(t.value));
+      }
+      case TokenType.STRING -> {
+        return new StringNode(t.value);
+      }
       case TokenType.OPEN_PAREN -> {
-          ExprNode e = parseExpr();
-          expect(TokenType.CLOSE_PAREN, "must close brackets after opening");
-          return e;
-          }
+        ExprNode e = parseExpr();
+        expect(TokenType.CLOSE_PAREN, "must close brackets after opening");
+        return e;
+      }
       default -> throw new RuntimeException("Could not parse token: " + t.type + ", value = " + t.value);
     }
   }

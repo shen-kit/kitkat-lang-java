@@ -13,5 +13,6 @@ public enum NodeType {
   BOOLEAN,
   NUMBER,
   BINARY_EXPR,
+  COMPARATOR_EXPR,
   IDENTIFIER, MEMBER, STRING,
 }

@@ -20,6 +20,44 @@ public class Interpreter {
     return lastProcessed;
   }
 
+  public RtVal evaluateComparatorExpr(ComparatorNode node, Scope scope) {
+    RtVal left = evaluate(node.left, scope);
+    RtVal right = evaluate(node.right, scope);
+
+    /* only allow comparisons between the same type */
+    if (left.type != right.type) {
+      throw new RuntimeException("Cannot compare values of type " + left.type + " and " + right.type);
+    }
+
+    boolean result = false;
+    // compare numbers
+    if (left.type == RuntimeType.NUMBER) {
+      int lNum = ((RtNumber) left).val;
+      int rNum = ((RtNumber) right).val;
+      switch (node.operator) {
+        case "==" -> result = lNum == rNum;
+        case "!=" -> result = lNum != rNum;
+        case ">=" -> result = lNum >= rNum;
+        case "<=" -> result = lNum <= rNum;
+        case ">" -> result = lNum > rNum;
+        case "<" -> result = lNum < rNum;
+        default -> throw new RuntimeException("Unexpected operator found for integer comparison: " + node.operator);
+      }
+    }
+    // compare strings
+    else if (left.type == RuntimeType.STRING) {
+      String lNum = ((RtString) left).value;
+      String rNum = ((RtString) right).value;
+      switch (node.operator) {
+        case "==" -> result = lNum.equals(rNum);
+        case "!=" -> result = !lNum.equals(rNum);
+        default -> throw new RuntimeException("Unexpected operator found for String comparison: " + node.operator);
+      }
+    }
+
+    return new RtBool(result);
+  }
+
   public RtVal evaluateBinaryExpr(BinaryExpr expr, Scope scope) {
     RtVal left = evaluate(expr.left, scope);
     RtVal right = evaluate(expr.right, scope);
@@ -125,6 +163,8 @@ public class Interpreter {
         return evaluateObject((ObjectNode) s, scope);
       case NodeType.BINARY_EXPR:
         return evaluateBinaryExpr((BinaryExpr) s, scope);
+      case NodeType.COMPARATOR_EXPR:
+        return evaluateComparatorExpr((ComparatorNode) s, scope);
       case NodeType.NUMBER:
         return new RtNumber(((NumberNode) s).getValue());
       case NodeType.MEMBER:

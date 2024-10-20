@@ -11,6 +11,6 @@ public class RtBool extends RtVal {
 
 	@Override
 	public String toString() {
-		return "RtBool: " + (val ? "true" : "false");
+		return val ? "true" : "false";
 	}
 }

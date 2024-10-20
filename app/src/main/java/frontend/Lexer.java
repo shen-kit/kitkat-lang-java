@@ -60,9 +60,15 @@ class Lexer {
         case ']' -> tokens.add(token(c, TokenType.CLOSE_BRACKET));
         case '{' -> tokens.add(token(c, TokenType.OPEN_BRACE));
         case '}' -> tokens.add(token(c, TokenType.CLOSE_BRACE));
-        case '=' -> tokens.add(token(c, TokenType.EQUALS));
+        case '=' -> {
+          if (q.peek() == '=') { // == (comparison)
+            q.poll();
+            tokens.add(token("==", TokenType.COMPARATOR));
+          } else // = (assignment)
+            tokens.add(token(c, TokenType.EQUALS));
+        }
         case '+', '-', '*', '/', '%' -> tokens.add(token(c, TokenType.BINARY_OPERATOR));
-        // comments
+        // comments, ignore until EOL
         case '#' -> {
           while (!q.isEmpty() && q.peek() != '\n')
             q.poll();
@@ -104,6 +110,14 @@ class Lexer {
             } else {
               tokens.add(token(word, TokenType.IDENTIFIER));
             }
+          }
+
+          // comparators --> != | > | < | >= | <=
+          else if ((c == '!' && q.peek() == '=') || c == '>' || c == '<') {
+            String op = "" + c;
+            if (q.peek() == '=')
+              op += q.poll();
+            tokens.add(token(op, TokenType.COMPARATOR));
           }
 
           else if (!isSkippable(c)) {
